@@ -826,7 +826,7 @@ public class Element extends Node {
                     if (accum.length() > 0 &&
                         (element.isBlock() || element.tag.getName().equals("br")) &&
                         !TextNode.lastCharIsWhitespace(accum))
-                        accum.append(" ");
+                        accum.append("\t");
                 }
             }
 
@@ -836,6 +836,30 @@ public class Element extends Node {
         return accum.toString().trim();
     }
 
+
+    public String text(final boolean append) {
+        final StringBuilder accum = new StringBuilder();
+        new NodeTraversor(new NodeVisitor() {
+            public void head(Node node, int depth) {
+                if (node instanceof TextNode) {
+                    TextNode textNode = (TextNode) node;
+                    appendNormalisedText(accum, textNode);
+                    if(append)
+                    	accum.append("\t");
+                } else if (node instanceof Element) {
+                    Element element = (Element) node;
+                    if (accum.length() > 0 &&
+                        (element.isBlock() || element.tag.getName().equals("br")) &&
+                        !TextNode.lastCharIsWhitespace(accum))
+                        accum.append("\t");
+                }
+            }
+
+            public void tail(Node node, int depth) {
+            }
+        }).traverse(this);
+        return accum.toString().trim();
+    }
     /**
      * Gets the text owned by this element only; does not get the combined text of all children.
      * <p>
@@ -871,7 +895,12 @@ public class Element extends Node {
             text = TextNode.normaliseWhitespace(text);
             if (TextNode.lastCharIsWhitespace(accum))
                 text = TextNode.stripLeadingWhitespace(text);
+            
+            if(text != null)
+            	text = text.replaceAll(" $", "");
         }
+        if(text == null || text.length() == 0)
+        	text = "placeholder";
         accum.append(text);
     }
 

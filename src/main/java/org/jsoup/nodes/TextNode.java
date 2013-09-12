@@ -118,6 +118,8 @@ public class TextNode extends Node {
 
     static String normaliseWhitespace(String text) {
         text = StringUtil.normaliseWhitespace(text);
+        if(text.equals(" "))
+        	text = "\t";
         return text;
     }
 
@@ -126,7 +128,7 @@ public class TextNode extends Node {
     }
 
     static boolean lastCharIsWhitespace(StringBuilder sb) {
-        return sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ';
+        return sb.length() != 0 && (sb.charAt(sb.length() - 1) == ' ' || sb.charAt(sb.length() - 1) == ' ');
     }
 
     // attribute fiddling. create on first access.

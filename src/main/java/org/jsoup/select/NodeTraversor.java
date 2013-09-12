@@ -1,5 +1,6 @@
 package org.jsoup.select;
 
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
 /**
@@ -27,10 +28,26 @@ public class NodeTraversor {
         int depth = 0;
         
         while (node != null) {
-            visitor.head(node, depth);
+        	visitor.head(node, depth);
             if (node.childNodeSize() > 0) {
-                node = node.childNode(0);
-                depth++;
+            	if(node instanceof Element) {
+                    Element element = (Element) node;
+                    if(element.attr("style").indexOf("display:none") < 0) {
+                        node = node.childNode(0);
+                        depth++;
+                    }
+                    else {
+                    	while (node.nextSibling() == null && depth > 0) {
+                            visitor.tail(node, depth);
+                            node = node.parent();
+                            depth--;
+                        }
+                        visitor.tail(node, depth);
+                        if (node == root)
+                            break;
+                        node = node.nextSibling();
+                    }
+            	}
             } else {
                 while (node.nextSibling() == null && depth > 0) {
                     visitor.tail(node, depth);
